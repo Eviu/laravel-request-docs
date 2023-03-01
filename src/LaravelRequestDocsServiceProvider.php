@@ -2,10 +2,9 @@
 
 namespace Rakutentech\LaravelRequestDocs;
 
+use Route;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Rakutentech\LaravelRequestDocs\Commands\LaravelRequestDocsCommand;
-use Route;
 
 class LaravelRequestDocsServiceProvider extends PackageServiceProvider
 {
@@ -21,7 +20,7 @@ class LaravelRequestDocsServiceProvider extends PackageServiceProvider
             ->hasConfigFile('request-docs')
             // ->hasAssets()
             ->hasViews();
-            // ->hasAssets();
+        // ->hasAssets();
     }
 
     public function packageBooted()
@@ -34,14 +33,19 @@ class LaravelRequestDocsServiceProvider extends PackageServiceProvider
             ->middleware(config('request-docs.middlewares'));
 
         // Following url for api and assets, donot change to config one.
-        Route::get("request-docs/api", [\Rakutentech\LaravelRequestDocs\Controllers\LaravelRequestDocsController::class, 'api'])
+        Route::get('request-docs/api', [\Rakutentech\LaravelRequestDocs\Controllers\LaravelRequestDocsController::class, 'api'])
             ->name('request-docs.api')
             ->middleware(config('request-docs.middlewares'));
 
-        Route::get("request-docs/_astro/{slug}", [\Rakutentech\LaravelRequestDocs\Controllers\LaravelRequestDocsController::class, 'assets'])
+        Route::get('request-docs/_astro/{slug}', [\Rakutentech\LaravelRequestDocs\Controllers\LaravelRequestDocsController::class, 'assets'])
             // where slug is either js or css
             ->where('slug', '.*js|.*css|.*png|.*jpg|.*jpeg|.*gif|.*svg|.*ico|.*woff|.*woff2|.*ttf|.*eot|.*otf|.*map')
             ->name('request-docs.assets')
             ->middleware(config('request-docs.middlewares'));
+    }
+
+    public function packageRegistered()
+    {
+        $this->app->singleton(OpenApiPipeline::class);
     }
 }

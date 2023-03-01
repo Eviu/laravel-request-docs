@@ -13,5 +13,8 @@ class LRDOpenApiTest extends TestCase
         foreach ($openApi["paths"] as $path) {
             $countRoutes += count(array_keys($path));
         }
+
+        // no exceptions so far
+        $this->assertTrue(true);
     }
 }

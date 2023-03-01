@@ -12,7 +12,7 @@ class LRDTest extends TestCase
     {
         $docs = $this->lrd->getDocs();
 
-        $docSize  = 10;
+        $docSize  = 11;
         $firstDoc = $docs[0];
         $this->assertCount($docSize, $firstDoc);
         $this->assertArrayHasKey('uri', $firstDoc);
@@ -24,6 +24,7 @@ class LRDTest extends TestCase
         $this->assertArrayHasKey('httpMethod', $firstDoc);
         $this->assertArrayHasKey('rules', $firstDoc);
         $this->assertArrayHasKey('docBlock', $firstDoc);
+        $this->assertArrayHasKey('parameters', $firstDoc);
     }
 
     public function testDocsCanFetchAllMethods()
@@ -310,9 +311,9 @@ class LRDTest extends TestCase
 
     public function testGroupByFQController()
     {
-        Route::get('users', [UserController::class]);
-        Route::post('users', [UserController::class]);
-        Route::put('users/update', [UserController::class]);
+        Route::get('users', UserController::class);
+        Route::post('users', UserController::class);
+        Route::put('users/update', UserController::class);
         $docs = $this->lrd->getDocs();
         $docs = $this->lrd->groupDocs($docs, 'controller_full_path');
 

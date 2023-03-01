@@ -4,13 +4,14 @@ namespace Rakutentech\LaravelRequestDocs\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
 use Rakutentech\LaravelRequestDocs\LaravelRequestDocs;
 use Rakutentech\LaravelRequestDocs\LaravelRequestDocsToOpenApi;
-use Illuminate\Routing\Controller;
 
 class LaravelRequestDocsController extends Controller
 {
     private $laravelRequestDocs;
+    private $laravelRequestDocsToOpenApi;
 
     public function __construct(LaravelRequestDocs $laravelRequestDoc, LaravelRequestDocsToOpenApi $laravelRequestDocsToOpenApi)
     {
@@ -22,11 +23,13 @@ class LaravelRequestDocsController extends Controller
     {
         return view('request-docs::index');
     }
+
     public function api(Request $request)
     {
         $docs = $this->laravelRequestDocs->getDocs();
-        $docs = $this->laravelRequestDocs->sortDocs($docs, $request->sort);
-        $docs = $this->laravelRequestDocs->groupDocs($docs, $request->groupby);
+
+        $docs = $this->laravelRequestDocs->sortDocs($docs, $request->get('sort', 'default'));
+        $docs = $this->laravelRequestDocs->groupDocs($docs, $request->get('groupby', 'default'));
 
         $showGet = $request->has('showGet') ? $request->showGet == 'true' : true;
         $showPost = $request->has('showPost') ? $request->showPost == 'true' : true;
@@ -44,12 +47,13 @@ class LaravelRequestDocsController extends Controller
             $showDelete,
             $showHead
         );
+
         if ($request->openapi) {
             return response()->json(
                 $this->laravelRequestDocsToOpenApi->openApi($docs)->toArray(),
                 Response::HTTP_OK,
                 [
-                    'Content-type'=> 'application/json; charset=utf-8'
+                    'Content-type'=> 'application/json; charset=utf-8',
                 ],
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
             );
@@ -70,7 +74,7 @@ class LaravelRequestDocsController extends Controller
         $path = explode('/', $request->path());
         $path = end($path);
         // read js, css from dist folder
-        $path = base_path() . "/vendor/rakutentech/laravel-request-docs/resources/dist/_astro/" . $path;
+        $path = base_path() . '/vendor/rakutentech/laravel-request-docs/resources/dist/_astro/' . $path;
         if (file_exists($path)) {
             $headers = ['Content-Type' => 'text/plain'];
             // set MIME type to js module
@@ -96,8 +100,10 @@ class LaravelRequestDocsController extends Controller
             // set cache control headers
             $headers['Cache-Control'] = 'public, max-age=1800';
             $headers['Expires'] = gmdate('D, d M Y H:i:s \G\M\T', time() + 1800);
+
             return response()->file($path, $headers);
         }
+
         return response()->json(['error' => 'file not found'], 404);
     }
 }

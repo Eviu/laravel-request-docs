@@ -38,7 +38,7 @@ return [
         'rules'
     ],
     // Can be overridden as // @LRDResponses 200|400|401
-    'default_responses' => [ "200", "400", "401", "403", "404", "405", "422", "429", "500", "503"],
+    'default_responses' => ["200", "400", "401", "403", "404", "405", "422", "429", "500", "503"],
 
     // By default, LRD group your routes by the first /path.
     // This is a set of regex to group your routes by prefix.
@@ -61,6 +61,20 @@ return [
         'license' => 'Apache 2.0',
         'license_url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',
         'server_url' => env('APP_URL', 'http://localhost'),
+
+        // any route matching any of middlewares will have the default security applied
+        'auth_middlewares' => [
+            'auth:api', 'auth', 'auth:sanctum'
+        ],
+
+        // security declared in components which will be applied to all routes matching any of auth_middlewares
+        'security' => [
+            [
+                'passport' => [
+                    // scopes
+                ]
+            ]
+        ],
 
         // for now putting default responses for all. This can be changed later based on specific needs
         'responses' => [
@@ -89,7 +103,7 @@ return [
                 'content' => [
                     'application/json' => [
                         'schema' => [
-                            'type' => 'object',
+                            '$ref' => '#/components/schemas/UnauthorizedError',
                         ],
                     ],
                 ],
@@ -145,5 +159,39 @@ return [
                 ],
             ],
         ],
+
+        // declare schemas, security schemas etc
+        'components' => [
+            'passport' => [ // Unique name of security
+                'type' => 'oauth2', // The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
+                'description' => 'Laravel passport oauth2 security.',
+                'in' => 'header',
+                'scheme' => 'https',
+                'flows' => [
+                    'password' => [
+                        'authorizationUrl' => env('APP_URL') . '/oauth/authorize',
+                        'tokenUrl' => env('APP_URL') . '/oauth/token',
+                        'refreshUrl' => env('APP_URL') . '/token/refresh',
+                        'scopes' => []
+                    ],
+                ],
+            ],
+            'schemas' => [
+                'UnauthorizedError' => [
+                    'type' => 'object',
+                    'required' => ['status', 'message', 'id'],
+                    'properties' => [
+                        'code' => [
+                            'type' => 'integer',
+                            'format' => 'int32',
+                        ],
+                        'message' => [
+                            'type' => 'string',
+                            'example' =>  'Unauthenticated'
+                        ],
+                    ],
+                ],
+            ]
+        ]
     ],
 ];
