@@ -162,17 +162,19 @@ return [
 
         // declare schemas, security schemas etc
         'components' => [
-            'passport' => [ // Unique name of security
-                'type' => 'oauth2', // The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
-                'description' => 'Laravel passport oauth2 security.',
-                'in' => 'header',
-                'scheme' => 'https',
-                'flows' => [
-                    'password' => [
-                        'authorizationUrl' => env('APP_URL') . '/oauth/authorize',
-                        'tokenUrl' => env('APP_URL') . '/oauth/token',
-                        'refreshUrl' => env('APP_URL') . '/token/refresh',
-                        'scopes' => []
+            'securitySchemes' => [
+                'passport' => [ // Unique name of security
+                    'type' => 'oauth2', // The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
+                    'description' => 'Laravel passport oauth2 security.',
+                    'in' => 'header',
+                    'scheme' => 'https',
+                    'flows' => [
+                        'password' => [
+                            'authorizationUrl' => env('APP_URL') . '/oauth/authorize',
+                            'tokenUrl' => env('APP_URL') . '/oauth/token',
+                            'refreshUrl' => env('APP_URL') . '/token/refresh',
+                            'scopes' => []
+                        ],
                     ],
                 ],
             ],
